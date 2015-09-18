@@ -19,6 +19,22 @@ type Handle struct {
 	lock       sync.Mutex
 }
 
+// SetFlags log.SetFlags, use to override default flags
+func (handle *Handle) SetFlags(flag int) {
+	if handle.logger == nil {
+		return
+	}
+	handle.logger.SetFlags(flag)
+}
+
+// SetPrefix log.SetPrefix, use to override default prefix
+func (handle *Handle) SetPrefix(prefix string) {
+	if handle.logger == nil {
+		return
+	}
+	handle.logger.SetPrefix(prefix)
+}
+
 func (handle *Handle) printf(level DebugLevel, format string, input ...interface{}) {
 	if handle.logger == nil || handle.Level < level {
 		return
