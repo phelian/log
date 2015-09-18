@@ -17,22 +17,13 @@ const (
 	DEBUG DebugLevel = 20
 )
 
-// Rotation configuration
-type Rotation struct {
-	Rotate           bool  `json:"rotate"`
-	DaysBeforeRotate int64 `json:"days,omitempty"` // Number of days before rotating
-	Size             int64 `json:"size,omitempty"` // Number of bytes of file before rotating
-	DaysKeep         int64 `json:"keep,omitempty"` // Number of days to keep before removing
-	MaxFilesKeep     int64 `json:"max_files_keep"` // Number of rotated logfiles to keep
-	Compress         int64 `json:"compress"`       // Number of rotated files to keep before compressing, -1 = don't compress
-}
-
 // Config defines config attributes for auditlog module
 type Config struct {
-	Path     string   `json:"path`
-	Name     string   `json:"name"`
-	Level    string   `json:"level"`
-	Rotation Rotation `json:"rotation"`
+	Path     string         `json:"path`
+	Name     string         `json:"name.omitempty"`
+	Level    string         `json:"level,omitempty"`
+	Rotate   bool           `json:"rotate"`
+	Rotation RotationConfig `json:"rotation"`
 }
 
 // New returns a new handle to log
@@ -58,8 +49,8 @@ func New(config Config) (*Handle, error) {
 		Path:       config.Path,
 	}
 
-	if config.Rotation.Rotate {
-		err := setupRotation(handle, config.Rotation)
+	if config.Rotate {
+		err := handle.SetupRotation(config.Rotation, false)
 		if err != nil {
 			return nil, err
 		}
