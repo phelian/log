@@ -4,14 +4,14 @@ import "log"
 
 // Implements standard functions of go's log
 
-// Printf calls go standard log.Printf
+// Printf log.Printf
 func Printf(format string, v ...interface{}) {
-	log.Printf(format, v)
+	log.Printf(format, v...)
 }
 
-// Println calls go standard log.Println
+// Println log.Println
 func Println(v ...interface{}) {
-	log.Println(v)
+	log.Println(v...)
 }
 
 // Add more when needed
