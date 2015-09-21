@@ -30,7 +30,7 @@ type Config struct {
 func New(config Config) (*Handle, error) {
 	file, err := os.OpenFile(config.Path, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
 	if err != nil {
-		log.Println("Failed to open [%s] for log", config.Path)
+		log.Printf("Failed to open [%s] for log\n", config.Path)
 		return nil, errors.New("Failed to open path for log")
 	}
 
@@ -41,8 +41,13 @@ func New(config Config) (*Handle, error) {
 		level = DEBUG
 	}
 
+	prefix := ""
+	if config.Name != "" {
+		prefix = config.Name + ": "
+	}
+
 	handle := &Handle{
-		logger:     log.New(file, config.Name+": ", log.Ldate|log.Ltime),
+		logger:     log.New(file, prefix, log.Ldate|log.Ltime),
 		fileHandle: file,
 		Name:       config.Name,
 		Level:      level,

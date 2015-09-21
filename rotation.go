@@ -89,6 +89,7 @@ func (handle *Handle) SetupRotation(config RotationConfig, verbose bool) error {
 func (handle *Handle) rotate(verbose bool) error {
 	handle.lock.Lock()
 	defer handle.lock.Unlock()
+	newHandle := false
 
 	// Close existing file if open
 	if handle.fileHandle != nil {
@@ -97,6 +98,7 @@ func (handle *Handle) rotate(verbose bool) error {
 		if err != nil {
 			return err
 		}
+		newHandle = true
 	}
 
 	// Rename dest file
@@ -109,14 +111,19 @@ func (handle *Handle) rotate(verbose bool) error {
 		}
 	}
 
-	if handle.fileHandle != nil {
+	if newHandle {
 		handle.fileHandle, err = os.OpenFile(handle.Path, os.O_CREATE|os.O_WRONLY, 0666)
 		if err != nil {
-			log.Println("Failed to open [%s] for log", handle.Path)
+			log.Printf("Failed to open [%s] for log\n", handle.Path)
 			return errors.New("Failed to open path for log")
 		}
 
-		handle.logger = log.New(handle.fileHandle, handle.Name+": ", log.Ldate|log.Ltime)
+		prefix := ""
+		if handle.Name != "" {
+			prefix = handle.Name + ": "
+		}
+
+		handle.logger = log.New(handle.fileHandle, prefix, log.Ldate|log.Ltime)
 	}
 
 	if verbose {
