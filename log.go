@@ -22,6 +22,7 @@ type Config struct {
 	Path     string         `json:"path`
 	Name     string         `json:"name.omitempty"`
 	Level    string         `json:"level,omitempty"`
+	Verbose  bool           `json:"verbose"`
 	Rotate   bool           `json:"rotate"`
 	Rotation RotationConfig `json:"rotation"`
 }
@@ -55,7 +56,7 @@ func New(config Config) (*Handle, error) {
 	}
 
 	if config.Rotate {
-		err := handle.SetupRotation(config.Rotation, false)
+		err := handle.SetupRotation(config.Rotation, config.Verbose)
 		if err != nil {
 			return nil, err
 		}

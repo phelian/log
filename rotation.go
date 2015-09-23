@@ -17,11 +17,11 @@ import (
 
 // RotationConfig ...
 type RotationConfig struct {
-	DaysBeforeRotate int64 `json:"days,omitempty"` // Number of days before rotating
-	Size             int64 `json:"size,omitempty"` // Number of bytes of file before rotating
-	DaysKeep         int64 `json:"keep,omitempty"` // Number of days to keep before removing
-	MaxFilesKeep     int64 `json:"max_files_keep"` // Number of rotated logfiles to keep
-	Compress         int64 `json:"compress"`       // Number of rotated files to keep before compressing, -1 = don't compress
+	DaysBeforeRotate int64 `json:"days,omitempty"`      // Number of days before rotating
+	Size             int64 `json:"size,omitempty"`      // Number of bytes of file before rotating
+	DaysKeep         int64 `json:"days_keep,omitempty"` // Number of days to keep before removing
+	MaxFilesKeep     int64 `json:"max_files_keep"`      // Number of rotated logfiles to keep
+	Compress         int64 `json:"compress"`            // Number of rotated files to keep before compressing, -1 = don't compress
 }
 
 // SetupRotation starts a rotation on handle based on rotation configuration
@@ -78,7 +78,7 @@ func (handle *Handle) SetupRotation(config RotationConfig, verbose bool) error {
 
 	// Possible Configuration Issue
 	if config.DaysKeep <= 0 && config.MaxFilesKeep <= 0 {
-		fmt.Printf("!! WARNING !!\nLogs will be kept forever, this is probably not what you intended. Please set keep and/or max_files_keep for each log entry in config\n!! WARNING !!\n")
+		fmt.Printf("!! WARNING !!\nLog %s will be kept forever, this is probably not what you intended. Please set keep and/or max_files_keep for each log entry in config\n!! WARNING !!\n", handle.Path)
 	}
 
 	// Analyse log files at startup
@@ -106,11 +106,13 @@ func (handle *Handle) rotate(verbose bool) error {
 	rotatedName := handle.Path + "." + time.Now().Format(time.RFC3339)
 	if err == nil {
 		err = os.Rename(handle.Path, rotatedName)
+
 		if err != nil {
 			return err
 		}
 	}
 
+	// Implement copy/truncate?
 	if newHandle {
 		handle.fileHandle, err = os.OpenFile(handle.Path, os.O_CREATE|os.O_WRONLY, 0666)
 		if err != nil {
