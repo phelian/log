@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"path"
 	"runtime"
 	"sync"
 )
@@ -43,7 +44,7 @@ func (handle *Handle) printf(level DebugLevel, format string, input ...interface
 	extraFormat := ""
 	if level == ERROR {
 		_, file, line, _ := runtime.Caller(2)
-		extraFormat = fmt.Sprintf("%s:%d ERROR ", file, line)
+		extraFormat = fmt.Sprintf("%s:%d ERROR ", path.Base(file), line)
 	} else if level == INFO {
 		extraFormat = "INFO "
 	} else if level == DEBUG {
