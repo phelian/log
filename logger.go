@@ -18,10 +18,13 @@ type Handle struct {
 	Name       string
 	Level      DebugLevel
 	lock       sync.Mutex
+	Verbose    bool
 }
 
 // SetFlags log.SetFlags, use to override default flags
 func (handle *Handle) SetFlags(flag int) {
+	handle.lock.Lock()
+	defer handle.lock.Unlock()
 	if handle.logger == nil {
 		return
 	}
@@ -30,6 +33,8 @@ func (handle *Handle) SetFlags(flag int) {
 
 // SetPrefix log.SetPrefix, use to override default prefix
 func (handle *Handle) SetPrefix(prefix string) {
+	handle.lock.Lock()
+	defer handle.lock.Unlock()
 	if handle.logger == nil {
 		return
 	}
@@ -37,10 +42,6 @@ func (handle *Handle) SetPrefix(prefix string) {
 }
 
 func (handle *Handle) printf(level DebugLevel, format string, input ...interface{}) {
-	if handle.logger == nil || handle.Level < level {
-		return
-	}
-
 	extraFormat := ""
 	if level == ERROR {
 		_, file, line, _ := runtime.Caller(2)
@@ -52,29 +53,46 @@ func (handle *Handle) printf(level DebugLevel, format string, input ...interface
 	}
 
 	handle.lock.Lock()
+	defer handle.lock.Unlock()
+	if handle.logger == nil || handle.Level < level {
+		return
+	}
+
 	handle.logger.Printf(extraFormat+format, input...)
-	handle.lock.Unlock()
+	if handle.Verbose {
+		log.Printf(extraFormat+format, input...)
+	}
 }
 
 // Println always adds <input> line to log file
 func (handle *Handle) Println(input string) {
+	handle.lock.Lock()
+	defer handle.lock.Unlock()
+
 	if handle.logger == nil {
 		return
 	}
 
-	handle.lock.Lock()
 	handle.logger.Println(input)
-	handle.lock.Unlock()
+
+	if handle.Verbose {
+		log.Println(input)
+	}
 }
 
 // PrintRestCall adds line to auditlog file with "<ip>: <action> - <result>"" format
 func (handle *Handle) PrintRestCall(req *http.Request, action string, result string) {
+	handle.lock.Lock()
+	defer handle.lock.Unlock()
+
 	if handle.logger == nil {
 		return
 	}
-	handle.lock.Lock()
 	handle.logger.Printf("%s: %s - %s\n", req.RemoteAddr, action, result)
-	handle.lock.Unlock()
+
+	if handle.Verbose {
+		log.Printf("%s: %s - %s\n", req.RemoteAddr, action, result)
+	}
 }
 
 // Error puts a string in the log with the ERROR debuglevel. Outputs file and linenumber where error occured.

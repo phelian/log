@@ -53,6 +53,7 @@ func New(config Config) (*Handle, error) {
 		Name:       config.Name,
 		Level:      level,
 		Path:       config.Path,
+		Verbose:    config.Verbose,
 	}
 
 	if config.Rotate {
