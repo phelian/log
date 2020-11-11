@@ -1,7 +1,5 @@
 package log
 
-import "context"
-
 // Logger interface taken from https://github.com/golang/go/issues/28412
 type Logger interface {
 	// all levels + Prin
@@ -33,8 +31,4 @@ type Logger interface {
 	Prefixf(fromat string, v ...interface{}) Logger
 	// fields for other formatters, acts like prefix be default
 	WithField(k, v interface{}) Logger
-
-	// Context stuff as explained earlier
-	Ctx(ctx context.Context) (Logger, context.Context)
-	SetCtxCallback(func(ctx context.Context, logger Logger) context.Context)
 }
