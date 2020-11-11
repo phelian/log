@@ -6,6 +6,9 @@ import (
 	"os"
 )
 
+// Version is the log pkg version
+const Version = "0.0.1"
+
 // DebugLevel for containing fixed levels
 type DebugLevel int64
 
