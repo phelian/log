@@ -19,7 +19,7 @@ const (
 
 // Config defines config attributes for auditlog module
 type Config struct {
-	Path     string         `json:"path`
+	Path     string         `json:"path"`
 	Name     string         `json:"name.omitempty"`
 	Level    string         `json:"level,omitempty"`
 	Verbose  bool           `json:"verbose"`
